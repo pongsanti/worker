@@ -7,11 +7,11 @@ import (
 type Worker struct {
 	workChannel    chan int
 	numberOfWorker int
-	workFunction   func(int)
+	workFunction   func(int) error
 	workerStarted  bool
 }
 
-func NewWorker(workFunction func(payload int), numberOfWorker int) *Worker {
+func NewWorker(workFunction func(payload int) error, numberOfWorker int) *Worker {
 	workChannel := make(chan int, 1)
 
 	worker := &Worker{
@@ -30,7 +30,10 @@ func (w *Worker) workingFunction(number int) {
 			break
 		} else {
 			log.Printf("Running from worker No.%d\n", number+1)
-			w.workFunction(val)
+			err := w.workFunction(val)
+			if err != nil {
+				log.Print("Error from working function ", err)
+			}
 		}
 	}
 }
